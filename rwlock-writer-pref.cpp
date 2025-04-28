@@ -1,5 +1,6 @@
 #include "rwlock.h"
 
+//Does not allow more readdcers when writer is waiting to write
 void InitalizeReadWriteLock(struct read_write_lock * rw)
 {
   //	Write the code for initializing your read-write lock.
