@@ -13,7 +13,7 @@ bool testCasePassed;
 struct read_write_lock rwlock;
 pthread_spinlock_t spinlock;
 
-void *Reader(void* arg)
+void *Reader(void *arg)
 {
 	int threadNUmber = *((int *)arg);
 
@@ -35,15 +35,15 @@ void *Reader(void* arg)
 
 	// Releasing the Lock
 	ReaderUnlock(&rwlock);
-	// printf("Reader: %d has released the lock\n",threadNUmber);
+	// printf("Reader: %d has released the lock\n", threadNUmber);
 	return 0;
 }
 
-void *Writer(void* arg)
+void *Writer(void *arg)
 {
 	int threadNUmber = *((int *)arg);
 
-  // Occupying the Lock
+	// Occupying the Lock
 	WriterLock(&rwlock);
 
 	pthread_spin_lock(&spinlock);
@@ -51,8 +51,8 @@ void *Writer(void* arg)
 	index++;
 	pthread_spin_unlock(&spinlock);
 
-	// printf("Writer: %d has acquired the lock\n",threadNUmber);
-  usleep(100000);
+	// printf("Writer: %d has acquired the lock\n", threadNUmber);
+	usleep(100000);
 
 	pthread_spin_lock(&spinlock);
 	writerReleaseTime[threadNUmber] = index;
@@ -61,7 +61,7 @@ void *Writer(void* arg)
 
 	// Releasing the Lock
 	WriterUnlock(&rwlock);
-	// printf("Writer: %d has released the lock\n",threadNUmber);
+	// printf("Writer: %d has released the lock\n", threadNUmber);
 	return 0;
 }
 
@@ -80,18 +80,18 @@ int main(int argc, char *argv[])
 	write_num_threads = atoi(argv[2]);
 
 	index = 0;
-	readerAcquireTime = new long[read_num_threads*2];
-	readerReleaseTime = new long[read_num_threads*2];
+	readerAcquireTime = new long[read_num_threads * 2];
+	readerReleaseTime = new long[read_num_threads * 2];
 	writerAcquireTime = new long[write_num_threads];
 	writerReleaseTime = new long[write_num_threads];
 	pthread_spin_init(&spinlock, 0);
 
-	int num_threads = 2*read_num_threads + write_num_threads;
+	int num_threads = 2 * read_num_threads + write_num_threads;
 
-	threads = (pthread_t*) malloc(num_threads * (sizeof(pthread_t)));
+	threads = (pthread_t *)malloc(num_threads * (sizeof(pthread_t)));
 
 	int count = 0;
-	for(int i=0;i<read_num_threads;i++)
+	for (int i = 0; i < read_num_threads; i++)
 	{
 
 		int *arg = (int *)malloc((sizeof(int)));
@@ -101,16 +101,16 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 		*arg = i;
-		int ret = pthread_create(threads+count,NULL,Reader,(void*) arg);
-		if(ret)
-    {
-        printf("Error - pthread_create() return code: %d\n",ret);
-        exit(EXIT_FAILURE);
-    }
+		int ret = pthread_create(threads + count, NULL, Reader, (void *)arg);
+		if (ret)
+		{
+			printf("Error - pthread_create() return code: %d\n", ret);
+			exit(EXIT_FAILURE);
+		}
 		count++;
 	}
 
-	for(int i=0;i<write_num_threads;i++)
+	for (int i = 0; i < write_num_threads; i++)
 	{
 		int *arg = (int *)malloc((sizeof(int)));
 		if (arg == NULL)
@@ -119,17 +119,17 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 		*arg = i;
-		int ret = pthread_create(threads+count,NULL,Writer,(void*) arg);
-		if(ret)
-    {
-        printf("Error - pthread_create() return code: %d\n",ret);
-        exit(EXIT_FAILURE);
-    }
+		int ret = pthread_create(threads + count, NULL, Writer, (void *)arg);
+		if (ret)
+		{
+			printf("Error - pthread_create() return code: %d\n", ret);
+			exit(EXIT_FAILURE);
+		}
 		count++;
 	}
 	usleep(500);
 
-	for(int i=0;i<read_num_threads;i++)
+	for (int i = 0; i < read_num_threads; i++)
 	{
 
 		int *arg = (int *)malloc((sizeof(int)));
@@ -139,20 +139,20 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 		*arg = read_num_threads + i;
-		int ret = pthread_create(threads+count,NULL,Reader,(void*) arg);
-		if(ret)
-    {
-        printf("Error - pthread_create() return code: %d\n",ret);
-        exit(EXIT_FAILURE);
-    }
+		int ret = pthread_create(threads + count, NULL, Reader, (void *)arg);
+		if (ret)
+		{
+			printf("Error - pthread_create() return code: %d\n", ret);
+			exit(EXIT_FAILURE);
+		}
 		count++;
 	}
 
-	for(int i=0;i<num_threads; i++)
-		pthread_join(threads[i],NULL);
+	for (int i = 0; i < num_threads; i++)
+		pthread_join(threads[i], NULL);
 
-	// TESTING SCRIPT 
-	// for(int i=0; i<read_num_threads*2; i++)
+	// TESTING SCRIPT
+	// for (int i = 0; i < read_num_threads * 2; i++)
 	// 	printf("Reader %d Lock Time: %ld Unlock Time: %ld\n", i, readerAcquireTime[i], readerReleaseTime[i]);
 
 	// for (int i = 0; i < write_num_threads; i++)
@@ -175,7 +175,8 @@ int main(int argc, char *argv[])
 	// }
 
 	// check if all readers get lock immediately in second half
-	if  ((read_num_threads > 0) && (*max_reader_acquire_time_second_half > *min_reader_release_time_second_half)){
+	if ((read_num_threads > 0) && (*max_reader_acquire_time_second_half > *min_reader_release_time_second_half))
+	{
 		printf("Reader should not wait to acquire lock in second half\n");
 		exit(0);
 	}
@@ -188,7 +189,8 @@ int main(int argc, char *argv[])
 	// }
 
 	// check if no reader is holding while a writer is still holding lock
-	if ((read_num_threads > 0) && (write_num_threads > 0) && (*min_reader_acquire_time_second_half < *max_writer_release_time)){
+	if ((read_num_threads > 0) && (write_num_threads > 0) && (*min_reader_acquire_time_second_half < *max_writer_release_time))
+	{
 		printf("Reader can not acquire lock when writer is holding a lock\n");
 		exit(0);
 	}
