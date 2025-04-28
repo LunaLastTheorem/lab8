@@ -1,27 +1,32 @@
 #include "rwlock.h"
 
-//Does not allow more readdcers when writer is waiting to write
+//Allow as may readers possible, allows writer to starve
 void InitalizeReadWriteLock(struct read_write_lock * rw)
 {
-  //	Write the code for initializing your read-write lock.
+  rw->readers = 0;
+  pthread_mutex_init(&rw->lock, NULL);
+  pthread_mutex_init(&rw->writer_lock, NULL);
+  pthread_cond_init(&rw->writer_done, NULL);
 }
 
 void ReaderLock(struct read_write_lock * rw)
 {
-  //	Write the code for aquiring read-write lock by the reader.
+  pthread_mutex_lock(&rw->lock);
+  pthread_mutex_unlock(&rw->lock);
 }
 
 void ReaderUnlock(struct read_write_lock * rw)
 {
-  //	Write the code for releasing read-write lock by the reader.
+  pthread_mutex_lock(&rw->lock);
+  pthread_mutex_unlock(&rw->lock);
 }
 
 void WriterLock(struct read_write_lock * rw)
 {
-  //	Write the code for aquiring read-write lock by the writer.
+  pthread_mutex_lock(&rw->writer_lock);
 }
 
 void WriterUnlock(struct read_write_lock * rw)
 {
-  //	Write the code for releasing read-write lock by the writer.
+  pthread_mutex_unlock(&rw->writer_lock);
 }

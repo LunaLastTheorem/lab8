@@ -10,7 +10,9 @@ struct read_write_lock
 {
     pthread_mutex_t lock;
     pthread_mutex_t writer_lock;
+    pthread_cond_t writer_done;
     int readers;
+    int writers;
 };
 
 void InitalizeReadWriteLock(struct read_write_lock * rw);
